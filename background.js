@@ -9,6 +9,11 @@ chrome.contextMenus.create({
       const selectedText = info.selectionText;
       const url = new URL(tab.url);
       const domain = url.hostname.replace(".unidesk.ac.uk", "");
+      const validFormat = /^[IPCA]\d{4}(-\d{3}|\d{2}-\d{4})$/;
+      if (!validFormat.test(selectedText)) {
+        showNotification("Selected text doesn't appear to be a valid unidesk reference.");
+        return;
+      }
       const link = `https://unidesk.ac.uk/${domain}/${selectedText}`;
       try {
         await copyToClipboard(link, tab.id);
@@ -21,7 +26,8 @@ chrome.contextMenus.create({
   
   async function copyToClipboard(text, tabId) {
     try {
-      await navigator.clipboard.writeText(text);
+      //await navigator.clipboard.writeText(text);
+      throw new Error("Using fallback copy method");
     } catch (err) {
       await chrome.scripting.executeScript({
         target: { tabId },
@@ -35,7 +41,6 @@ chrome.contextMenus.create({
         },
         args: [text],
       });
-      showNotification("Copied to clipboard");
     }
   }
   
